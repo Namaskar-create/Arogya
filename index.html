@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>धर्मगंज - नालंदा डिजिटल आरोग्य पीठ</title>
+  <style>
+    :root {
+      --primary: #8b2500;
+      --bg: #fbf9f4;
+      --card-bg: #ffffff;
+      --text: #2c2523;
+      --muted: #6e6259;
+      --accent: #2e7d32;
+      --warn: #c62828;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding: 20px; }
+    .container { max-width: 750px; margin: 0 auto; }
+    
+    header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
+    header h1 { font-size: 2rem; color: var(--primary); letter-spacing: 0.5px; }
+    header p { color: var(--muted); font-size: 0.95rem; margin-top: 5px; }
+    
+    .search-box { position: relative; margin-bottom: 25px; }
+    .search-input { width: 100%; padding: 14px 18px; font-size: 1.05rem; border: 2px solid #dfd7cc; border-radius: 12px; outline: none; background: #fff; transition: 0.2s; }
+    .search-input:focus { border-color: var(--primary); box-shadow: 0 4px 12px rgba(139, 37, 0, 0.1); }
+    
+    .result-card { background: var(--card-bg); border-radius: 14px; padding: 22px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eee7de; display: none; }
+    .badge { display: inline-block; background: #f4ece1; color: var(--primary); font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 6px; margin-bottom: 10px; }
+    .disease-title { font-size: 1.4rem; color: var(--primary); margin-bottom: 8px; }
+    .root-cause { font-size: 0.95rem; color: var(--muted); margin-bottom: 18px; border-left: 3px solid var(--primary); padding-left: 10px; }
+    
+    .section-title { font-size: 1rem; font-weight: 700; margin: 14px 0 6px 0; display: flex; align-items: center; gap: 6px; }
+    .step-box { background: #faf8f5; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; border: 1px solid #ede5d8; }
+    .step-box strong { color: var(--text); display: block; margin-bottom: 3px; }
+    
+    .pathya { border-left: 4px solid var(--accent); }
+    .apatha { border-left: 4px solid var(--warn); }
+    
+    .empty-state { text-align: center; color: var(--muted); padding: 40px 10px; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>धर्मगंज</h1>
+    <p>नालंदा परंपरा पर आधारित प्रामाणिक स्वास्थ्य सूत्र</p>
+  </header>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" class="search-input" placeholder="रोग का नाम खोजें (उदा. एसिडिटी, सिरदर्द, शुगर, बीपी...)" onkeyup="searchDisease()">
+  </div>
+
+  <div id="resultsArea"></div>
+  <div id="emptyState" class="empty-state">सटीक शास्त्रीय निदान देखने के लिए ऊपर किसी रोग का नाम लिखें।</div>
+</div>
+
+<script>
+const diseases = [
+  {
+    id: "acidity",
+    name: "अम्लपित्त एवं अपच (Acidity and Indigestion)",
+    keywords: ["acidity", "gas", "acid", "pet", "liver", "indigestion", "jalan", "एसिडिटी", "गैस", "तेजाब", "लिवर"],
+    dosh: "पित्त प्रकोप एवं मंदाग्नि",
+    cause: "जठराग्नि के मंद होने से भोजन का आमाशय में सड़ना और 'आम' (टॉक्सिन) का निर्माण होना।",
+    instant: {
+      title: "[तुरंत राहत] 24 से 48 घंटे - हिम कल्पना",
+      desc: "1 चम्मच सौंफ और 1 चम्मच साबुत धनिया रातभर 1 गिलास पानी में भिगोएं। सुबह मसलकर छान लें, स्वादानुसार मिश्री मिलाकर खाली पेट पिएं।"
+    },
+    cure: {
+      title: "[मूल सुधार] 21 से 45 दिन - कालमेघ व दीपन योग",
+      desc: "1. भूमि आंवला और कालमेघ चूर्ण (2-2 ग्राम) सुबह-शाम भोजन से 30 मिनट पहले गुनगुने जल से लें।<br>2. भोजन से ठीक 5 मिनट पहले 1 टुकड़ा अदरक + 2 बूंद नींबू रस + चुटकीभर सेंधा नमक चबाएं।"
+    },
+    pathya: "जौ, मूंग दाल, पुराना चावल, घिया, परवल, भोजन के 45 मिनट बाद गुनगुना पानी।",
+    apatha: "दूध के साथ नमक या प्याज, रात में भारी भोजन, भोजन के तुरंत बाद ठंडा पानी, खाली पेट चाय-कॉफी।"
+  },
+  {
+    id: "diabetes",
+    name: "मधुमेह एवं प्रमेह (Type 2 Diabetes / Sugar)",
+    keywords: ["diabetes", "sugar", "madhumeh", "blood sugar", "शुगर", "डायबिटीज", "मधुमेह"],
+    dosh: "कफ-वात प्रकोप एवं मेद धातु विकृति",
+    cause: "शारीरिक निष्क्रियता, मीठे व गरिष्ठ भोजन से कफ की वृद्धि और जठराग्नि का मंद होना।",
+    instant: {
+      title: "[त्वरित संतुलन] निशा-आमलकी योग",
+      desc: "आंवला चूर्ण (3 ग्राम) + शुद्ध हल्दी चूर्ण (1 ग्राम) को ताजे गुनगुने पानी में मिलाकर सुबह खाली पेट पिएं।"
+    },
+    cure: {
+      title: "[मूल सुधार] 60 से 90 दिन - विजयसार व जामुन क्वाथ",
+      desc: "1. विजयसार की लकड़ी का काढ़ा या उसके बर्तन में रातभर रखा पानी सुबह पिएं।<br>2. जामुन की गुठली, मेथी दाना और गिलोय का चूर्ण 3 ग्राम सुबह-शाम भोजन से 45 मिनट
+
+
+
+
+
+
+
+
